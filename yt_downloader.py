@@ -4,11 +4,11 @@ import random
 
 def present_terms_of_service():
     tos = """
-    Downloading videos from YouTube to keep permanently or share without permission is generally against their Terms of Service. 
+    Downloading videos from YouTube to keep permanently or share without permission is generally against their Terms of Service.
     YouTube states that their content is owned by the creators and protected by copyright.
 
     However, YouTube does allow downloading videos for personal, non-commercial use in some cases. This includes being able to download videos when using YouTube Premium or using tools like YouTube Studio for content creators.
-    
+
     Downloading audio only from YouTube videos to make into music playlists or offline listening may fall into a gray area. YouTube offers an official YouTube Music app that allows this, suggesting it is tolerated to some degree. But systematic downloading of audio at scale could still violate Terms.
 
     There are some third party sites and tools that allow downloading YouTube videos. However, YouTube actively works to disable and block these when discovered. So use of third party downloaders comes with some risk of YouTube actions against the account.
@@ -19,66 +19,47 @@ def present_terms_of_service():
 
     Additional Resources:
     - YouTube's full Terms of Service: https://www.youtube.com/static?template=terms
-      Specifically section 5 outlines restrictions around downloading content. Key points are that you can't download significant portions of content, circumvent technical restrictions, or provide tools for others to download.
-    
     - YouTube's policies on copyright: https://www.youtube.com/howyoutubeworks/policies/copyright/
-      This reiterates that all videos are protected by copyright, and downloading full videos requires the owner's permission. It also discusses fair use exceptions.
-    
     - YouTube Premium download terms: https://support.google.com/youtube/answer/132596?hl=en
-      This clarifies what downloading is allowed for paid Premium subscribers. It's for personal offline use only.
-    
     - YouTube Studio download feature: https://support.google.com/youtube/answer/94316?hl=en
-      Content creators can download their own videos using YouTube Studio tools. Downloads are watermarked and limited.
-
-    Let me know if you need any clarification on YouTube's policies!
     """
     print(tos)
-
     acknowledgment_code = ''.join(
         [str(random.randint(0, 9)) for _ in range(5)])
     print(
         f"\nPlease enter the following code to acknowledge the Terms of Service: {acknowledgment_code}")
-
     user_input = input("Enter the 5-number sequence: ")
     if user_input != acknowledgment_code:
         print("Incorrect code or acknowledgment refused. Exiting.")
         exit()
 
 
+def prompt_url():
+    while True:
+        url = input("Enter the YouTube or YouTube Music URL: ")
+        if url.startswith("https://www.youtube.com") or url.startswith("https://music.youtube.com"):
+            return url
+        else:
+            print(f"\nInvalid URL provided: {url}")
+            print("The URL must be a valid YouTube or YouTube Music link starting with 'https://www.youtube.com' or 'https://music.youtube.com'.")
+            choice = input(
+                "Would you like to:\n1. Provide a new URL\n2. Exit the application\nEnter your choice (1/2): ")
+            if choice == '2':
+                exit()
+
+
 def download_from_youtube():
-    # URL Source Selection
-    url = input("Enter the YouTube or YouTube Music URL: ")
-    if "music.youtube.com" in url:
-        print("Detected YouTube Music URL.")
-    else:
-        print("Detected standard YouTube URL.")
+    url = prompt_url()
 
-    # Format Selection using Numerical Choices
-    print("Choose desired format:\n1. Video\n2. Audio")
-    format_choice = input("Enter your choice (1/2): ")
-
-    # youtube_dl Configuration
-    if format_choice == "2":
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'outtmpl': './%(title)s.%(ext)s',
-        }
-    elif format_choice == "1":
-        ydl_opts = {
-            'format': 'bestvideo+bestaudio',
-            'outtmpl': './%(title)s.%(ext)s',
-        }
-    else:
-        print("Invalid format choice. Exiting.")
-        return
+    # (Insert your code here for detecting URL type, choosing format, and defining ydl_opts)
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+        try:
+            ydl.download([url])
+        except youtube_dl.utils.UnsupportedError:
+            print("Unsupported URL or an error occurred. Please ensure the provided URL is a valid YouTube or YouTube Music link.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {str(e)}")
 
 
 if __name__ == "__main__":
